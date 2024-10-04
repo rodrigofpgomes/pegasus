@@ -71,6 +71,7 @@
 #include "pegasus_msgs/msg/control_attitude.hpp"
 #include "pegasus_msgs/msg/control_velocity.hpp"
 #include "pegasus_msgs/msg/control_acceleration.hpp"
+#include "pegasus_msgs/msg/control_motors.hpp"
 
 // Services for arming, auto-landing, etc.
 #include "pegasus_msgs/srv/arm.hpp"
@@ -278,13 +279,23 @@ private:
      * @defgroup subscriberCallbacks
      * This group defines all the ROS subscriber callbacks
      */
-
+    
     /**
      * @ingroup subscriberCallbacks
      * @brief Position subscriber callback. The position of the vehicle should be expressed in the NED reference frame
      * @param msg A message with the desired position for the vehicle in NED
      */
     void position_callback(const pegasus_msgs::msg::ControlPosition::ConstSharedPtr msg);
+
+
+	/**
+	 * @ingroup subscriberCallbacks
+	 * @brief Callback for motor control. This function sets the PWM values for the motors based on the received message.
+	 *        The PWM values should correspond to the desired motor commands for controlling the vehicle.
+	 * @param msg A message containing the desired PWM values for each motor.
+	 */
+	void motors_callback(const pegasus_msgs::msg::ControlMotors::ConstSharedPtr msg);
+
 
     /**
      * @ingroup subscriberCallbacks
@@ -484,6 +495,8 @@ private:
     rclcpp::Subscription<pegasus_msgs::msg::ControlVelocity>::SharedPtr inertial_velocity_control_sub_{nullptr};
     rclcpp::Subscription<pegasus_msgs::msg::ControlVelocity>::SharedPtr body_velocity_control_sub_{nullptr};
     rclcpp::Subscription<pegasus_msgs::msg::ControlAcceleration>::SharedPtr inertial_acceleration_control_sub_{nullptr};
+    
+	rclcpp::Subscription<pegasus_msgs::msg::ControlMotors>::SharedPtr motors_control_sub_{nullptr};
 
     /**
      * @ingroup subscribers

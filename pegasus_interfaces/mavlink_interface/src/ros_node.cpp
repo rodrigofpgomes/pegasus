@@ -218,6 +218,19 @@ void ROSNode::init_subscribers_and_services() {
     rclcpp::Parameter position_control_topic = this->get_parameter("subscribers.control.position");
     position_control_sub_ = this->create_subscription<pegasus_msgs::msg::ControlPosition>(
         position_control_topic.as_string(), rclcpp::SensorDataQoS(), std::bind(&ROSNode::position_callback, this, std::placeholders::_1));
+        
+    
+	// ------------------------------------------------------------------------
+	// Subscribe to the motor control (PWM values for controlling the motors)
+	// ------------------------------------------------------------------------
+	this->declare_parameter<std::string>("subscribers.control.motors", "control/motors"); 
+	rclcpp::Parameter motors_control_topic = this->get_parameter("subscribers.control.motors");
+	motors_control_sub_ = this->create_subscription<pegasus_msgs::msg::ControlMotors>(
+		motors_control_topic.as_string(), 
+		rclcpp::SensorDataQoS(), 
+		std::bind(&ROSNode::motors_callback, this, std::placeholders::_1)
+	);
+	
 
     // ------------------------------------------------------------------------
     // Subscribe to the inertial velocity control (north-east-down in meters/s NED) and desired yaw (in deg)
@@ -414,6 +427,18 @@ void ROSNode::update_system_id(const uint8_t & id) {
 void ROSNode::position_callback(const pegasus_msgs::msg::ControlPosition::ConstSharedPtr msg) {
     // Send the position reference thorugh mavlink for the onboard microcontroller
     mavlink_node_->set_position(msg->position[0], msg->position[1], msg->position[2], msg->yaw);
+}
+
+
+/**
+ * @ingroup subscriberCallbacks
+ * @brief Callback for motor control. This function sets the PWM values for the motors based on the received message.
+ *        The PWM values should correspond to the desired motor commands for controlling the vehicle.
+ * @param msg A message containing the desired PWM values for each motor.
+ */
+void ROSNode::motors_callback(const pegasus_msgs::msg::ControlMotors::ConstSharedPtr msg) {
+	//Send the motors PWM value thorugh mavlink for the onboard microcontroller
+	mavlink_node_->set_motors(msg->motor[0], msg->motor[1], msg->motor[2], msg->motor[3], msg->motor[4], msg->motor[5], msg->motor[6], msg->motor[7]);
 }
 
 

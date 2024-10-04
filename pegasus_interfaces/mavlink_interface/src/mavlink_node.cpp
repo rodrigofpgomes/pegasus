@@ -298,6 +298,22 @@ void MavlinkNode::set_attitude(const float roll, const float pitch, const float 
     offboard_->set_attitude(attitude_);
 }
 
+	/**
+	 * @ingroup control_callbacks
+	 * @brief Method to set the value off motors (motor_1, motor_2...) according the input value
+	 * @param motor_1 Value of the PWM signal input to the respective motor 1.
+	 * @param motor_2 Value of the PWM signal input to the respective motor 2.
+	 * @param motor_3 Value of the PWM signal input to the respective motor 3.
+	 * @param motor_4 Value of the PWM signal input to the respective motor 4.
+	 * @param motor_5 Value of the PWM signal input to the respective motor 5.
+	 * @param motor_6 Value of the PWM signal input to the respective motor 6.
+	 * @param motor_7 Value of the PWM signal input to the respective motor 7.
+	 * @param motor_8 Value of the PWM signal input to the respective motor 8.
+	void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
+
+	}
+	*/
+
 /**
  * @ingroup control_callbacks
  * @brief Method to set the attitude_rate (roll-rate, pitch-rate and yaw-rate) according to Z-Y-X convention
@@ -342,6 +358,63 @@ void MavlinkNode::set_position(const float x, const float y, const float z, cons
     // Send the message to the onboard vehicle controller
     offboard_->set_position_ned(position_);
 }
+
+
+/**
+ * @ingroup control_callbacks
+ * @brief Method to set the PWM signal values for the vehicle's motors.
+ * @param motor_1 Value of the PWM signal input to the respective motor 1.
+ * @param motor_2 Value of the PWM signal input to the respective motor 2.
+ * @param motor_3 Value of the PWM signal input to the respective motor 3.
+ * @param motor_4 Value of the PWM signal input to the respective motor 4.
+ * @param motor_5 Value of the PWM signal input to the respective motor 5.
+ * @param motor_6 Value of the PWM signal input to the respective motor 6.
+ * @param motor_7 Value of the PWM signal input to the respective motor 7.
+ * @param motor_8 Value of the PWM signal input to the respective motor 8.
+*/
+void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, 
+	                         const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
+	mavlink_command_long_t cmd;
+
+	// Enviar comando para os motores/atuadores de 1 a 6
+	cmd.target_system = system_id_;  // ID do sistema detectado
+	cmd.target_component = 1;  // ID do componente (normalmente 1 para Pixhawk)
+	cmd.command = MAV_CMD_DO_SET_ACTUATOR;  // Comando MAVLink para setar atuadores
+	cmd.confirmation = 0;
+
+	// Definir valores PWM para os atuadores 1 a 6
+	cmd.param1 = motor_1;
+	cmd.param2 = motor_2;
+	cmd.param3 = motor_3;
+	cmd.param4 = motor_4;
+	cmd.param5 = motor_5;
+	cmd.param6 = motor_6;
+	cmd.param7 = 0;  // O índice de conjunto de atuadores (primeiro conjunto: 1 a 6)
+
+	// Codificar e enviar a mensagem MAVLink para o primeiro grupo (atuadores 1 a 6)
+	mavlink_message_t msg;
+	mavlink_msg_command_long_encode(system_id_, MAV_COMP_ID_ALL, &msg, &cmd);
+
+	uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+	int len = mavlink_msg_to_send_buffer(buffer, &msg);
+	send_mavlink_message(buffer, len);
+
+	// Enviar comando para os motores/atuadores 7 e 8
+	cmd.param1 = motor_7;
+	cmd.param2 = motor_8;
+	cmd.param3 = NAN;  // Restante não utilizado
+	cmd.param4 = NAN;
+	cmd.param5 = NAN;
+	cmd.param6 = NAN;
+	cmd.param7 = 1;  // Índice de conjunto para os atuadores 7 e 8
+
+	// Codificar e enviar a mensagem MAVLink para o segundo grupo (atuadores 7 e 8)
+	mavlink_msg_command_long_encode(system_id_, MAV_COMP_ID_ALL, &msg, &cmd);
+	len = mavlink_msg_to_send_buffer(buffer, &msg);
+	send_mavlink_message(buffer, len);
+}
+	
+
 
 /**
  * @ingroup control_callbacks
