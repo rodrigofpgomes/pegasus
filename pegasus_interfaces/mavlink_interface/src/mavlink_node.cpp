@@ -374,44 +374,17 @@ void MavlinkNode::set_position(const float x, const float y, const float z, cons
 */
 void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, 
 	                         const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
-	mavlink_command_long_t cmd;
 
-	// Enviar comando para os motores/atuadores de 1 a 6
-	cmd.target_system = system_id_;  // ID do sistema detectado
-	cmd.target_component = 1;  // ID do componente (normalmente 1 para Pixhawk)
-	cmd.command = MAV_CMD_DO_SET_ACTUATOR;  // Comando MAVLink para setar atuadores
-	cmd.confirmation = 0;
+    Offboard::ActuatorControl actuator_control_;
 
-	// Definir valores PWM para os atuadores 1 a 6
-	cmd.param1 = motor_1;
-	cmd.param2 = motor_2;
-	cmd.param3 = motor_3;
-	cmd.param4 = motor_4;
-	cmd.param5 = motor_5;
-	cmd.param6 = motor_6;
-	cmd.param7 = 0;  // O índice de conjunto de atuadores (primeiro conjunto: 1 a 6)
-
-	// Codificar e enviar a mensagem MAVLink para o primeiro grupo (atuadores 1 a 6)
-	mavlink_message_t msg;
-	mavlink_msg_command_long_encode(system_id_, MAV_COMP_ID_ALL, &msg, &cmd);
-
-	uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-	int len = mavlink_msg_to_send_buffer(buffer, &msg);
-	send_mavlink_message(buffer, len);
-
-	// Enviar comando para os motores/atuadores 7 e 8
-	cmd.param1 = motor_7;
-	cmd.param2 = motor_8;
-	cmd.param3 = NAN;  // Restante não utilizado
-	cmd.param4 = NAN;
-	cmd.param5 = NAN;
-	cmd.param6 = NAN;
-	cmd.param7 = 1;  // Índice de conjunto para os atuadores 7 e 8
-
-	// Codificar e enviar a mensagem MAVLink para o segundo grupo (atuadores 7 e 8)
-	mavlink_msg_command_long_encode(system_id_, MAV_COMP_ID_ALL, &msg, &cmd);
-	len = mavlink_msg_to_send_buffer(buffer, &msg);
-	send_mavlink_message(buffer, len);
+    // Grupo 0 (atuadores 0-7)
+    actuator_control_.group[0] = { motor_1, motor_2, motor_3, motor_4, motor_5, motor_6, motor_7, motor_8 };
+    
+    // Grupo 1 (atuadores 8-15)
+    actuator_control_.group[1] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
+    
+    // Send the message to the onboard vehicle controller
+    offboard_->set_actuator_control(actuator_control_);
 }
 	
 
