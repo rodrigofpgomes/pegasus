@@ -375,6 +375,12 @@ private:
 
     /**
      * @ingroup mavsdk_control_messages
+     * @brief Message to set the motors value...
+     */
+    mavsdk::Offboard::ActuatorControl actuator_control_;
+
+    /**
+     * @ingroup mavsdk_control_messages
      * @brief Message to set the velocity (Vx, Vy, Vz) (m/s) and yaw (deg) of the vehicle. The adopted frame is NED
      */
     mavsdk::Offboard::VelocityNedYaw inertial_velocity_;

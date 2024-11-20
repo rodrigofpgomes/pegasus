@@ -298,21 +298,6 @@ void MavlinkNode::set_attitude(const float roll, const float pitch, const float 
     offboard_->set_attitude(attitude_);
 }
 
-	/**
-	 * @ingroup control_callbacks
-	 * @brief Method to set the value off motors (motor_1, motor_2...) according the input value
-	 * @param motor_1 Value of the PWM signal input to the respective motor 1.
-	 * @param motor_2 Value of the PWM signal input to the respective motor 2.
-	 * @param motor_3 Value of the PWM signal input to the respective motor 3.
-	 * @param motor_4 Value of the PWM signal input to the respective motor 4.
-	 * @param motor_5 Value of the PWM signal input to the respective motor 5.
-	 * @param motor_6 Value of the PWM signal input to the respective motor 6.
-	 * @param motor_7 Value of the PWM signal input to the respective motor 7.
-	 * @param motor_8 Value of the PWM signal input to the respective motor 8.
-	void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
-
-	}
-	*/
 
 /**
  * @ingroup control_callbacks
@@ -375,13 +360,27 @@ void MavlinkNode::set_position(const float x, const float y, const float z, cons
 void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, 
 	                         const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
 
-    Offboard::ActuatorControl actuator_control_;
+    //Offboard::ActuatorControl actuator_control_;
 
     // Grupo 0 (atuadores 0-7)
-    actuator_control_.group[0] = { motor_1, motor_2, motor_3, motor_4, motor_5, motor_6, motor_7, motor_8 };
+    actuator_control_.groups[0].controls[0] = motor_1;
+    actuator_control_.groups[0].controls[1] = motor_2;
+    actuator_control_.groups[0].controls[2] = motor_3;
+    actuator_control_.groups[0].controls[3] = motor_4;
+    actuator_control_.groups[0].controls[4] = motor_5;
+    actuator_control_.groups[0].controls[5] = motor_6;
+    actuator_control_.groups[0].controls[6] = motor_7;
+    actuator_control_.groups[0].controls[7] = motor_8;
     
     // Grupo 1 (atuadores 8-15)
-    actuator_control_.group[1] = { NAN, NAN, NAN, NAN, NAN, NAN, NAN, NAN };
+    actuator_control_.groups[1].controls[0] = NAN;
+    actuator_control_.groups[1].controls[1] = NAN;
+    actuator_control_.groups[1].controls[2] = NAN;
+    actuator_control_.groups[1].controls[3] = NAN;
+    actuator_control_.groups[1].controls[4] = NAN;
+    actuator_control_.groups[1].controls[5] = NAN;
+    actuator_control_.groups[1].controls[6] = NAN;
+    actuator_control_.groups[1].controls[7] = NAN;
     
     // Send the message to the onboard vehicle controller
     offboard_->set_actuator_control(actuator_control_);
