@@ -954,16 +954,8 @@ void ROSNode::control_motors_callback(const pegasus_msgs::srv::ControlMotors::Re
 
     RCLCPP_INFO(this->get_logger(), "Received control request - Index: %d, Value: %.2f", index, value);
 
-    bool success = false;
-
-    // Validate motor index
-    if (index >= 0 && index < 8)  
-        success = mavlink_node_->control_motor(index, value); 
-    else
-        success = false;
-
     // Send response
-    response->success = success;
+    response->success = mavlink_node_->control_motors(index, value); 
 }
 
 /**

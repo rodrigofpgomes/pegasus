@@ -71,11 +71,12 @@
 #include "pegasus_msgs/msg/control_attitude.hpp"
 #include "pegasus_msgs/msg/control_velocity.hpp"
 #include "pegasus_msgs/msg/control_acceleration.hpp"
-#include "pegasus_msgs/msg/control_motors.hpp"
+//#include "pegasus_msgs/msg/control_motors.hpp"
 
 // Services for arming, auto-landing, etc.
 #include "pegasus_msgs/srv/arm.hpp"
 #include "pegasus_msgs/srv/kill_switch.hpp"
+#include "pegasus_msgs/srv/control_motors.hpp"
 #include "pegasus_msgs/srv/land.hpp"
 #include "pegasus_msgs/srv/offboard.hpp"
 #include "pegasus_msgs/srv/position_hold.hpp"
@@ -388,6 +389,15 @@ private:
     void kill_switch_callback(const pegasus_msgs::srv::KillSwitch::Request::SharedPtr request, const pegasus_msgs::srv::KillSwitch::Response::SharedPtr response);
    
     /**
+    * @ingroup servicesCallbacks
+    * @brief Control motors service callback. When a service request is reached from the control_motors_service_,
+    * this callback is called and will send a mavlink command for the vehicle to change value of the 
+    * @param request An empty request for entering position hold mode (can be ignored)
+    * @param response The response in this service uint8
+    */
+    void control_motors_callback(const pegasus_msgs::srv::ControlMotors::Request::SharedPtr request, const pegasus_msgs::srv::ControlMotors::Response::SharedPtr response);
+    
+    /**
      * @ingroup servicesCallbacks
      * @brief Autoland service callback. When a service request is reached from the land_service_,
      * this callback is called and will send a mavlink command for the vehicle to autoland using the onboard controller
@@ -547,6 +557,12 @@ private:
      * @brief Service server to arm the vehicle
      */
     rclcpp::Service<pegasus_msgs::srv::Arm>::SharedPtr arm_service_{nullptr};
+
+    /**
+     * @ingroup services
+     * @brief Service server to control motors
+     */
+    rclcpp::Service<pegasus_msgs::srv::ControlMotors>::SharedPtr control_motors_service_{nullptr};
 
     /**
      * @ingroup services

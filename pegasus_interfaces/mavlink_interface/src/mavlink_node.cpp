@@ -460,6 +460,18 @@ uint8_t MavlinkNode::kill_switch() {
 }
 
 /**
+ * @brief Sends a signal to control a specific motor or actuator.
+ * 
+ * @param index Specifies the index of the motor/actuator to control.
+ *              This should be an integer representing the target gate
+ * @param value Specifies the value to set for the actuator
+ *              The value should be a float, between 0.0 (minimum) and 1.0 (maximum)
+ */
+uint8_t MavlinkNode::control_motors(const int index, const float value) {
+    return static_cast<uint8_t>(action_->set_actuator(static_cast<int32_t>(index), value));
+}
+
+/**
  * @brief Method to autoland the vehicle using the onboard microntroller controller
  */
 uint8_t MavlinkNode::land() {
