@@ -219,7 +219,7 @@ void ROSNode::init_subscribers_and_services() {
     position_control_sub_ = this->create_subscription<pegasus_msgs::msg::ControlPosition>(
         position_control_topic.as_string(), rclcpp::SensorDataQoS(), std::bind(&ROSNode::position_callback, this, std::placeholders::_1));
         
-    
+    /** 
 	// ------------------------------------------------------------------------
 	// Subscribe to the motor control (PWM values for controlling the motors)
 	// ------------------------------------------------------------------------
@@ -230,6 +230,7 @@ void ROSNode::init_subscribers_and_services() {
 		rclcpp::SensorDataQoS(), 
 		std::bind(&ROSNode::motors_callback, this, std::placeholders::_1)
 	);
+    */
 	
 
     // ------------------------------------------------------------------------
@@ -311,6 +312,14 @@ void ROSNode::init_subscribers_and_services() {
     rclcpp::Parameter arm_topic = this->get_parameter("services.arm");
     arm_service_ = this->create_service<pegasus_msgs::srv::Arm>(
         arm_topic.as_string(), std::bind(&ROSNode::arm_callback, this, std::placeholders::_1, std::placeholders::_2));
+    
+    // ------------------------------------------------------------------------
+    // Initiate the service to control motors on vehicle
+    // ------------------------------------------------------------------------
+    this->declare_parameter<std::string>("services.control_motors", "control_motors");
+    rclcpp::Parameter control_motors_topic = this->get_parameter("services.control_motors");
+    control_motors_service_ = this->create_service<pegasus_msgs::srv::ControlMotors>(
+        control_motors_topic.as_string(), std::bind(&ROSNode::control_motors_callback, this, std::placeholders::_1, std::placeholders::_2));
     
     // ------------------------------------------------------------------------
     // Initiate the service to kill switch the vehicle
@@ -886,7 +895,7 @@ void ROSNode::arm_callback(const pegasus_msgs::srv::Arm::Request::SharedPtr requ
  * @param response The response in this service uint8
 */
 void ROSNode::kill_switch_callback(const pegasus_msgs::srv::KillSwitch::Request::SharedPtr request, const pegasus_msgs::srv::KillSwitch::Response::SharedPtr response) {
-    
+
     // Set the response to the kill switch command
     response->success = request->kill == true ? mavlink_node_->kill_switch() : 0;
 }
@@ -928,6 +937,33 @@ void ROSNode::position_hold_callback(const pegasus_msgs::srv::PositionHold::Requ
 
     // Set the response to the result of the offboard command
     response->success = mavlink_node_->position_hold();
+}
+
+/**
+ * @ingroup servicesCallbacks
+ * @brief Control motors service callback. When a service request is reached from the control_motors_service_,
+ * this callback is called and will send a mavlink command for the vehicle to change value of the 
+ * @param request An empty request for entering position hold mode (can be ignored)
+ * @param response The response in this service uint8
+ */
+void ROSNode::control_motors_callback(const pegasus_msgs::srv::ControlMotors::Request::SharedPtr request, const pegasus_msgs::srv::ControlMotors::Response::SharedPtr response) {
+    
+    // Retrieve values from the request
+    int index = request->index;  
+    float value = request->value;  
+
+    RCLCPP_INFO(this->get_logger(), "Received control request - Index: %d, Value: %.2f", index, value);
+
+    bool success = false;
+
+    // Validate motor index
+    if (index >= 0 && index < 8)  
+        success = mavlink_node_->control_motor(index, value); 
+    else
+        success = false;
+
+    // Send response
+    response->success = success;
 }
 
 /**

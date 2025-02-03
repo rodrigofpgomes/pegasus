@@ -356,7 +356,7 @@ void MavlinkNode::set_position(const float x, const float y, const float z, cons
  * @param motor_6 Value of the PWM signal input to the respective motor 6.
  * @param motor_7 Value of the PWM signal input to the respective motor 7.
  * @param motor_8 Value of the PWM signal input to the respective motor 8.
-*/
+
 void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, 
 	                         const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
 
@@ -385,7 +385,7 @@ void MavlinkNode::set_motors(const float motor_1, const float motor_2, const flo
     // Send the message to the onboard vehicle controller
     offboard_->set_actuator_control(actuator_control_);
 }
-	
+*/
 
 
 /**
