@@ -22,6 +22,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pegasus_demos = pegasus_demos.demo:main',
+            'gripper = pegasus_demos.gripper:main',
         ],
     },
 )
