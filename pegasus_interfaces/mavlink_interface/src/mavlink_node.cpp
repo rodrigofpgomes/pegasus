@@ -344,50 +344,6 @@ void MavlinkNode::set_position(const float x, const float y, const float z, cons
     offboard_->set_position_ned(position_);
 }
 
-
-/**
- * @ingroup control_callbacks
- * @brief Method to set the PWM signal values for the vehicle's motors.
- * @param motor_1 Value of the PWM signal input to the respective motor 1.
- * @param motor_2 Value of the PWM signal input to the respective motor 2.
- * @param motor_3 Value of the PWM signal input to the respective motor 3.
- * @param motor_4 Value of the PWM signal input to the respective motor 4.
- * @param motor_5 Value of the PWM signal input to the respective motor 5.
- * @param motor_6 Value of the PWM signal input to the respective motor 6.
- * @param motor_7 Value of the PWM signal input to the respective motor 7.
- * @param motor_8 Value of the PWM signal input to the respective motor 8.
-
-void MavlinkNode::set_motors(const float motor_1, const float motor_2, const float motor_3, const float motor_4, 
-	                         const float motor_5, const float motor_6, const float motor_7, const float motor_8) {
-
-    //Offboard::ActuatorControl actuator_control_;
-
-    // Grupo 0 (atuadores 0-7)
-    actuator_control_.groups[0].controls[0] = motor_1;
-    actuator_control_.groups[0].controls[1] = motor_2;
-    actuator_control_.groups[0].controls[2] = motor_3;
-    actuator_control_.groups[0].controls[3] = motor_4;
-    actuator_control_.groups[0].controls[4] = motor_5;
-    actuator_control_.groups[0].controls[5] = motor_6;
-    actuator_control_.groups[0].controls[6] = motor_7;
-    actuator_control_.groups[0].controls[7] = motor_8;
-    
-    // Grupo 1 (atuadores 8-15)
-    actuator_control_.groups[1].controls[0] = NAN;
-    actuator_control_.groups[1].controls[1] = NAN;
-    actuator_control_.groups[1].controls[2] = NAN;
-    actuator_control_.groups[1].controls[3] = NAN;
-    actuator_control_.groups[1].controls[4] = NAN;
-    actuator_control_.groups[1].controls[5] = NAN;
-    actuator_control_.groups[1].controls[6] = NAN;
-    actuator_control_.groups[1].controls[7] = NAN;
-    
-    // Send the message to the onboard vehicle controller
-    offboard_->set_actuator_control(actuator_control_);
-}
-*/
-
-
 /**
  * @ingroup control_callbacks
  * @brief Set the inertial velocity (Vx, Vy, Vz) (m/s) and yaw (deg) of the vehicle. The adopted frame is NED
@@ -465,10 +421,10 @@ uint8_t MavlinkNode::kill_switch() {
  * @param index Specifies the index of the motor/actuator to control.
  *              This should be an integer representing the target gate
  * @param value Specifies the value to set for the actuator
- *              The value should be a float, between 0.0 (minimum) and 1.0 (maximum)
+ *              The value should be a float, between -1.0 (minimum) and 1.0 (maximum)
  */
-uint8_t MavlinkNode::control_motors(const int index, const float value) {
-    return static_cast<uint8_t>(action_->set_actuator(static_cast<int32_t>(index), value));
+uint8_t MavlinkNode::set_motors(const int32_t index, const float value) {
+    return static_cast<uint8_t>(action_->set_actuator(index, value));
 }
 
 /**

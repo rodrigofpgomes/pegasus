@@ -288,16 +288,6 @@ private:
      */
     void position_callback(const pegasus_msgs::msg::ControlPosition::ConstSharedPtr msg);
 
-
-	/**
-	 * @ingroup subscriberCallbacks
-	 * @brief Callback for motor control. This function sets the PWM values for the motors based on the received message.
-	 *        The PWM values should correspond to the desired motor commands for controlling the vehicle.
-	 * @param msg A message containing the desired PWM values for each motor.
-	 */
-	void motors_callback(const pegasus_msgs::msg::ControlMotors::ConstSharedPtr msg);
-
-
     /**
      * @ingroup subscriberCallbacks
      * @brief Inertial velocity subscriber callback. The velocity should be expressed in the NED reference frame
@@ -506,8 +496,6 @@ private:
     rclcpp::Subscription<pegasus_msgs::msg::ControlVelocity>::SharedPtr body_velocity_control_sub_{nullptr};
     rclcpp::Subscription<pegasus_msgs::msg::ControlAcceleration>::SharedPtr inertial_acceleration_control_sub_{nullptr};
     
-	rclcpp::Subscription<pegasus_msgs::msg::ControlMotors>::SharedPtr motors_control_sub_{nullptr};
-
     /**
      * @ingroup subscribers
      * @brief Attitude and thrust subscriber. The attitude should be specified in euler angles in degrees
@@ -560,12 +548,6 @@ private:
 
     /**
      * @ingroup services
-     * @brief Service server to control motors
-     */
-    rclcpp::Service<pegasus_msgs::srv::ControlMotors>::SharedPtr control_motors_service_{nullptr};
-
-    /**
-     * @ingroup services
      * @brief Service server to disarm the vehicle
      */
     rclcpp::Service<pegasus_msgs::srv::KillSwitch>::SharedPtr kill_switch_service_{nullptr};
@@ -582,6 +564,14 @@ private:
      * @brief Service server to set the vehicle into the offboard mode 
      */
     rclcpp::Service<pegasus_msgs::srv::Offboard>::SharedPtr offboard_service_{nullptr};
+
+    /**
+     * @ingroup services
+     * @brief Service server to set the value of the motors
+     * 
+     * This service handles requests to update the motor control values
+     */
+    rclcpp::Service<pegasus_msgs::srv::ControlMotors>::SharedPtr control_motors_service_{nullptr};
 
     /**
      * @ingroup services
