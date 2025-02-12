@@ -102,7 +102,7 @@ def main(args=None):
     rclpy.spin(drone1)
     '''
 
-    drone1.set_control_motors(1,0.0)
+    drone1.set_control_motors(2,0.0)
 
     # Shutdown the demo
     drone1.destroy_node()

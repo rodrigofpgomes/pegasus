@@ -913,12 +913,12 @@ void ROSNode::position_hold_callback(const pegasus_msgs::srv::PositionHold::Requ
 }
 
 /**
- * @ingroup servicesCallbacks
- * @brief Control motors service callback. When a service request is reached from the control_motors_service_,
- * this callback is called and will send a mavlink command for the vehicle to change value of the 
- * @param request An empty request for entering position hold mode (can be ignored)
- * @param response The response in this service uint8
- */
+* @ingroup servicesCallbacks
+* @brief Control motors service callback. When a service request is reached from the control_motors_service_,
+* this callback is called and will send a mavlink command for the vehicle to change the value of the specified motor. 
+* @param request The request to set the motor value at the corresponding index.
+* @param response The response from this service, of type uint8.
+*/
 void ROSNode::control_motors_callback(const pegasus_msgs::srv::ControlMotors::Request::SharedPtr request, const pegasus_msgs::srv::ControlMotors::Response::SharedPtr response) {
     
     // Retrieve values from the request
